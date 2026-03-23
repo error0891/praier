@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0D0B12">
+<title>prAIer — Every Prayer, Every Language</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>✦</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;background:linear-gradient(170deg,#0D0B12,#14101C 40%,#1A1420 70%,#0D0B12);color:#F5F0EB;min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased}
+.screen{display:none;min-height:100vh;min-height:100dvh;position:relative;overflow:hidden;flex-direction:column;max-width:430px;margin:0 auto;width:100%}
+.screen.active{display:flex}
+@media(min-width:500px){body{background:#06050a}.screen{border-left:1px solid rgba(255,255,255,.03);border-right:1px solid rgba(255,255,255,.03);box-shadow:0 0 80px rgba(196,149,106,.03)}}
+@keyframes fU{0%{opacity:0;transform:translateY(16px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:.9}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(196,149,106,.1)}50%{box-shadow:0 0 40px rgba(196,149,106,.2)}}
+input[type=text],input[type=number]{font-family:system-ui,-apple-system,sans-serif}
+input::placeholder{color:rgba(245,240,235,.2)}
+*::-webkit-scrollbar{display:none}
+.scroll-area{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:60px}
+.pill{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);color:rgba(245,240,235,.3);font-size:11px;cursor:pointer;white-space:nowrap;font-family:system-ui,sans-serif;font-weight:500;letter-spacing:.3px;flex-shrink:0;transition:all .2s}
+.pill.sel{border-color:rgba(196,149,106,.3);background:rgba(196,149,106,.1);color:#C4956A}
+.prayer-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.prayer-card:active{transform:scale(.98)}
+.tag{font-size:9px;padding:2px 7px;border-radius:6px;font-family:system-ui,sans-serif;font-weight:500;letter-spacing:.3px;display:inline-block}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash" class="screen active" style="cursor:pointer">
+  <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(196,149,106,.12),transparent 70%);top:30%;left:50%;transform:translate(-50%,-50%);filter:blur(40px)"></div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
+    <div style="font-size:14px;letter-spacing:8px;color:rgba(196,149,106,.4);margin-bottom:12px;animation:fU .8s ease-out">✦</div>
+    <h1 style="font-size:48px;font-weight:300;letter-spacing:6px;animation:fU 1s ease-out .2s both;color:#C4956A">prAIer</h1>
+    <p style="font-size:12px;color:rgba(245,240,235,.3);letter-spacing:4px;margin-top:8px;animation:fU 1s ease-out .5s both;font-style:italic">every prayer, every language</p>
+    <p style="font-size:11px;color:rgba(245,240,235,.15);letter-spacing:2px;animation:fU 1s ease-out .8s both;margin-top:28px;font-family:system-ui,sans-serif">tap to enter</p>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="screen">
+  <div style="position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(196,149,106,.08),transparent 70%);top:-40px;right:-40px;filter:blur(50px);pointer-events:none"></div>
+  <div class="scroll-area" style="position:relative;z-index:1;padding:20px 22px;padding-top:max(20px,env(safe-area-inset-top,20px))">
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;animation:fU .5s ease-out">
+      <div>
+        <h1 style="font-size:24px;font-weight:300;letter-spacing:4px;color:#C4956A;margin:0">prAIer</h1>
+        <p style="font-size:10px;color:rgba(245,240,235,.25);letter-spacing:2px;margin:2px 0 0;font-style:italic">every prayer, every language</p>
+      </div>
+      <button id="favBtn" onclick="toggleFavView()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:6px 12px;color:rgba(245,240,235,.35);font-size:11px;cursor:pointer;font-family:system-ui,sans-serif;font-weight:500;letter-spacing:.5px">&#9829; <span id="favCount">0</span></button>
+    </div>
+
+    <!-- Search -->
+    <div style="position:relative;margin-bottom:10px;animation:fU .5s ease-out .05s both">
+      <input id="searchInput" type="text" placeholder="Search any prayer, verse, or mantra..." oninput="onSearch()" onkeydown="if(event.key==='Enter')aiSearch()" style="width:100%;padding:14px 48px 14px 18px;border-radius:14px;border:1px solid rgba(196,149,106,.12);background:rgba(255,255,255,.03);color:#F5F0EB;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;letter-spacing:.5px">
+      <button onclick="aiSearch()" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(196,149,106,.15);border:none;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#C4956A;font-size:16px;font-family:system-ui">✦</button>
+    </div>
+    <div style="font-size:10px;color:rgba(245,240,235,.2);text-align:center;margin-bottom:14px;font-family:system-ui,sans-serif;animation:fU .5s ease-out .08s both">press ✦ or enter to search with AI</div>
+
+    <!-- AI Result -->
+    <div id="aiResult" style="display:none;margin-bottom:14px"></div>
+
+    <!-- Tradition filter -->
+    <div id="filterBar" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;animation:fU .5s ease-out .1s both;-webkit-overflow-scrolling:touch"></div>
+
+    <!-- Section label -->
+    <div id="sectionLabel" style="font-size:10px;letter-spacing:2px;color:rgba(245,240,235,.2);text-transform:uppercase;margin-bottom:10px;font-family:system-ui,sans-serif;font-weight:500;animation:fU .5s ease-out .12s both"></div>
+
+    <!-- Prayer list -->
+    <div id="prayerList" style="display:flex;flex-direction:column;gap:8px"></div>
+
+    <!-- Empty state -->
+    <div id="emptyState" style="display:none;text-align:center;padding:40px 20px;color:rgba(245,240,235,.2)">
+      <div style="font-size:28px;margin-bottom:8px">✦</div>
+      <div id="emptyText" style="font-size:13px;font-style:italic"></div>
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align:center;margin-top:24px;font-size:10px;color:rgba(245,240,235,.12);font-family:system-ui,sans-serif;letter-spacing:1px">prAIer · sacred texts from every tradition</div>
+  </div>
+</div>
+
+<!-- PRAYER DETAIL -->
+<div id="detail" class="screen">
+  <div id="detailBg" style="position:absolute;width:300px;height:300px;border-radius:50%;filter:blur(60px);opacity:.15;pointer-events:none;top:10%;left:50%;transform:translateX(-50%)"></div>
+  <div class="scroll-area" style="position:relative;z-index:1;padding:20px 24px;padding-top:max(20px,env(safe-area-inset-top,20px))">
+    <!-- Nav -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <button onclick="showScreen('home')" style="background:rgba(255,255,255,.05);border:none;color:rgba(245,240,235,.5);font-size:13px;border-radius:10px;padding:7px 14px;cursor:pointer;font-family:inherit">&#8592; back</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="favToggle" onclick="toggleFav()" style="background:none;border:none;font-size:22px;cursor:pointer;filter:grayscale(1) opacity(.3);transition:all .2s">&#9825;</button>
+        <button id="voiceBtn" onclick="toggleVoice()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(245,240,235,.5);font-size:14px;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s" title="Read aloud">&#9835;</button>
+      </div>
+    </div>
+    <!-- Header -->
+    <div id="detailHeader" style="text-align:center;margin-bottom:24px;animation:fU .5s ease-out"></div>
+    <!-- Prayer text -->
+    <div id="detailText" style="background:rgba(255,255,255,.02);border-radius:16px;padding:28px 24px;margin-bottom:16px;animation:fU .5s ease-out .1s both"></div>
+    <!-- Source -->
+    <div id="detailSource" style="text-align:center;animation:fU .5s ease-out .2s both"></div>
+
+    <!-- Japa Counter -->
+    <div id="japaSection" style="margin-top:28px;animation:fU .5s ease-out .3s both">
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:10px;letter-spacing:3px;color:rgba(245,240,235,.2);text-transform:uppercase;font-family:system-ui,sans-serif;font-weight:500;margin-bottom:8px">japa counter</div>
+        <div style="display:flex;gap:6px;justify-content:center;margin-bottom:12px">
+          <button class="japa-preset pill sel" onclick="setJapaTarget(108)">108</button>
+          <button class="japa-preset pill" onclick="setJapaTarget(54)">54</button>
+          <button class="japa-preset pill" onclick="setJapaTarget(27)">27</button>
+          <button class="japa-preset pill" onclick="setJapaTarget(11)">11</button>
+          <div style="position:relative">
+            <input id="japaCustom" type="number" placeholder="..." min="1" max="1008" onchange="setJapaTarget(parseInt(this.value)||108)" style="width:48px;padding:6px 8px;border-radius:20px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);color:rgba(245,240,235,.3);font-size:11px;text-align:center;outline:none;font-family:system-ui,sans-serif">
+          </div>
+        </div>
+      </div>
+      <!-- Counter display -->
+      <div style="text-align:center;padding:20px;border-radius:18px;border:1px solid rgba(255,255,255,.04);background:rgba(255,255,255,.015)">
+        <div id="japaCount" style="font-size:48px;font-weight:300;color:#C4956A;letter-spacing:2px;transition:transform .1s">0</div>
+        <div style="font-size:11px;color:rgba(245,240,235,.25);font-family:system-ui,sans-serif;margin:4px 0 12px">of <span id="japaTarget">108</span></div>
+        <!-- Progress bar -->
+        <div style="width:100%;height:3px;border-radius:2px;background:rgba(255,255,255,.05);margin-bottom:14px;overflow:hidden">
+          <div id="japaProgress" style="height:100%;border-radius:2px;background:#C4956A;width:0%;transition:width .3s"></div>
+        </div>
+        <!-- Controls -->
+        <div style="display:flex;gap:10px;justify-content:center;align-items:center">
+          <button onclick="resetJapa()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(245,240,235,.3);font-size:10px;border-radius:10px;padding:8px 14px;cursor:pointer;font-family:system-ui,sans-serif;letter-spacing:.5px">reset</button>
+          <button id="japaBtn" onclick="tapJapa()" style="width:64px;height:64px;border-radius:50%;border:2px solid rgba(196,149,106,.3);background:rgba(196,149,106,.08);color:#C4956A;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:inherit">+</button>
+          <button id="japaVoiceBtn" onclick="toggleJapaVoice()" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(245,240,235,.3);font-size:10px;border-radius:10px;padding:8px 14px;cursor:pointer;font-family:system-ui,sans-serif;letter-spacing:.5px">&#9835; auto</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══ DATA ═══
+const PRAYERS=[
+{id:"ps23",title:"Psalm 23",tradition:"Christianity",tag:"Peace",subtitle:"The Lord is my shepherd",
+text:"The Lord is my shepherd; I shall not want.\nHe maketh me to lie down in green pastures:\nHe leadeth me beside the still waters.\nHe restoreth my soul:\nHe leadeth me in the paths of righteousness for his name's sake.\nYea, though I walk through the valley of the shadow of death, I will fear no evil:\nFor thou art with me; thy rod and thy staff they comfort me.\nThou preparest a table before me in the presence of mine enemies:\nThou anointest my head with oil; my cup runneth over.\nSurely goodness and mercy shall follow me all the days of my life:\nAnd I will dwell in the house of the Lord for ever.",
+source:"King James Bible, Psalm 23:1-6",lang:"English"},
+{id:"lords",title:"The Lord's Prayer",tradition:"Christianity",tag:"Daily",subtitle:"Our Father who art in heaven",
+text:"Our Father, who art in heaven,\nhallowed be thy name;\nthy kingdom come;\nthy will be done;\non earth as it is in heaven.\nGive us this day our daily bread.\nAnd forgive us our trespasses,\nas we forgive those who trespass against us.\nAnd lead us not into temptation;\nbut deliver us from evil.\nFor thine is the kingdom,\nthe power and the glory,\nfor ever and ever.\nAmen.",
+source:"Matthew 6:9-13, King James Bible",lang:"English"},
+{id:"phil4",title:"Philippians 4:6-7",tradition:"Christianity",tag:"Anxiety",subtitle:"Be anxious for nothing",
+text:"Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.\nAnd the peace of God, which passeth all understanding, shall keep your hearts and minds through Christ Jesus.",
+source:"King James Bible, Philippians 4:6-7",lang:"English"},
+{id:"ps91",title:"Psalm 91",tradition:"Christianity",tag:"Protection",subtitle:"He who dwells in the shelter of the Most High",
+text:"He that dwelleth in the secret place of the most High shall abide under the shadow of the Almighty.\nI will say of the Lord, He is my refuge and my fortress: my God; in him will I trust.\nSurely he shall deliver thee from the snare of the fowler, and from the noisome pestilence.\nHe shall cover thee with his feathers, and under his wings shalt thou trust: his truth shall be thy shield and buckler.\nThou shalt not be afraid for the terror by night; nor for the arrow that flieth by day;\nNor for the pestilence that walketh in darkness; nor for the destruction that wasteth at noonday.\nA thousand shall fall at thy side, and ten thousand at thy right hand; but it shall not come nigh thee.",
+source:"King James Bible, Psalm 91:1-7",lang:"English"},
+{id:"jer29",title:"Jeremiah 29:11",tradition:"Christianity",tag:"Hope",subtitle:"For I know the plans I have for you",
+text:"For I know the thoughts that I think toward you, saith the Lord, thoughts of peace, and not of evil, to give you an expected end.\nThen shall ye call upon me, and ye shall go and pray unto me, and I will hearken unto you.\nAnd ye shall seek me, and find me, when ye shall search for me with all your heart.",
+source:"King James Bible, Jeremiah 29:11-13",lang:"English"},
+{id:"rom8",title:"Romans 8:28",tradition:"Christianity",tag:"Faith",subtitle:"All things work together for good",
+text:"And we know that all things work together for good to them that love God, to them who are the called according to his purpose.\nFor whom he did foreknow, he also did predestinate to be conformed to the image of his Son, that he might be the firstborn among many brethren.",
+source:"King James Bible, Romans 8:28-29",lang:"English"},
+{id:"serenity",title:"Serenity Prayer",tradition:"Christianity",tag:"Strength",subtitle:"God, grant me the serenity",
+text:"God, grant me the serenity\nto accept the things I cannot change,\nthe courage to change the things I can,\nand the wisdom to know the difference.\nLiving one day at a time,\nenjoying one moment at a time;\naccepting hardship as a pathway to peace;\ntaking, as Jesus did,\nthis sinful world as it is,\nnot as I would have it;\ntrusting that You will make all things right\nif I surrender to Your will;\nso that I may be reasonably happy in this life\nand supremely happy with You forever in the next.\nAmen.",
+source:"Reinhold Niebuhr (attr.), c. 1932",lang:"English"},
+{id:"gayatri",title:"Gayatri Mantra",tradition:"Hinduism",tag:"Illumination",subtitle:"The most sacred Vedic hymn",
+text:"\u0950 \u092D\u0942\u0930\u094D\u092D\u0941\u0935\u0903 \u0938\u094D\u0935\u0903\n\u0924\u0924\u094D\u0938\u0935\u093F\u0924\u0941\u0930\u094D\u0935\u0930\u0947\u0923\u094D\u092F\u0902\n\u092D\u0930\u094D\u0917\u094B \u0926\u0947\u0935\u0938\u094D\u092F \u0927\u0940\u092E\u0939\u093F\n\u0927\u093F\u092F\u094B \u092F\u094B \u0928\u0903 \u092A\u094D\u0930\u091A\u094B\u0926\u092F\u093E\u0924\u094D\n\nO\u1E43 bh\u016Br bhuva\u1E25 sva\u1E25\ntat savitur vare\u1E47ya\u1E43\nbhargo devasya dh\u012Bmahi\ndhiyo yo na\u1E25 pracoday\u0101t\n\nWe meditate on the glory of that Being\nwho has produced this universe;\nmay that Being enlighten our minds.",
+source:"Rig Veda 3.62.10, ~1500 BCE",lang:"Sanskrit"},
+{id:"mahamrit",title:"Mahamrityunjaya Mantra",tradition:"Hinduism",tag:"Healing",subtitle:"The great death-conquering mantra",
+text:"\u0950 \u0924\u094D\u0930\u094D\u092F\u092E\u094D\u092C\u0915\u0902 \u092F\u091C\u093E\u092E\u0939\u0947\n\u0938\u0941\u0917\u0928\u094D\u0927\u093F\u0902 \u092A\u0941\u0937\u094D\u091F\u093F\u0935\u0930\u094D\u0927\u0928\u092E\u094D\n\u0909\u0930\u094D\u0935\u093E\u0930\u0941\u0915\u092E\u093F\u0935 \u092C\u0928\u094D\u0927\u0928\u093E\u0928\u094D\n\u092E\u0943\u0924\u094D\u092F\u094B\u0930\u094D\u092E\u0941\u0915\u094D\u0937\u0940\u092F \u092E\u093E\u092E\u0943\u0924\u093E\u0924\u094D\n\nO\u1E43 tryambaka\u1E43 yaj\u0101mahe\nsugandhim pu\u1E63\u1E6Di-vardhanam\nurv\u0101rukam iva bandhan\u0101n\nm\u1E5Btyor muk\u1E63\u012Bya m\u0101m\u1E5Bt\u0101t\n\nWe worship the three-eyed One,\nwho is fragrant and nourishes all beings.\nAs the cucumber is freed from its bondage to the vine,\nmay we be liberated from death, not from immortality.",
+source:"Rig Veda 7.59.12, ~1500 BCE",lang:"Sanskrit"},
+{id:"shanti",title:"Shanti Mantra",tradition:"Hinduism",tag:"Peace",subtitle:"The peace invocation",
+text:"\u0950 \u0938\u0939 \u0928\u093E\u0935\u0935\u0924\u0941\n\u0938\u0939 \u0928\u094C \u092D\u0941\u0928\u0915\u094D\u0924\u0941\n\u0938\u0939 \u0935\u0940\u0930\u094D\u092F\u0902 \u0915\u0930\u0935\u093E\u0935\u0939\u0948\n\u0924\u0947\u091C\u0938\u094D\u0935\u093F\u0928\u093E\u0935\u0927\u0940\u0924\u092E\u0938\u094D\u0924\u0941\n\u092E\u093E \u0935\u093F\u0926\u094D\u0935\u093F\u0937\u093E\u0935\u0939\u0948\n\u0950 \u0936\u093E\u0928\u094D\u0924\u093F\u0903 \u0936\u093E\u0928\u094D\u0924\u093F\u0903 \u0936\u093E\u0928\u094D\u0924\u093F\u0903\n\nO\u1E43 saha n\u0101vavatu\nsaha nau bhunaktu\nsaha v\u012Brya\u1E43 karav\u0101vahai\ntejasvi n\u0101vadh\u012Btamastu\nm\u0101 vidvi\u1E63\u0101vahai\nO\u1E43 \u015B\u0101nti\u1E25 \u015B\u0101nti\u1E25 \u015B\u0101nti\u1E25\n\nMay we be protected together.\nMay we be nourished together.\nMay we work together with great energy.\nMay our study be enlightening.\nMay we not hate each other.\nOm peace, peace, peace.",
+source:"Taittiriya Upanishad, ~600 BCE",lang:"Sanskrit"},
+{id:"ganesh",title:"Ganesh Mantra",tradition:"Hinduism",tag:"New beginnings",subtitle:"Remover of obstacles",
+text:"\u0950 \u0917\u0902 \u0917\u0923\u092A\u0924\u092F\u0947 \u0928\u092E\u0903\n\nO\u1E43 ga\u1E43 ga\u1E47apataye nama\u1E25\n\nSalutations to Lord Ganesha,\nthe remover of all obstacles.\n\n\u0935\u0915\u094D\u0930\u0924\u0941\u0923\u094D\u0921 \u092E\u0939\u093E\u0915\u093E\u092F\n\u0938\u0942\u0930\u094D\u092F\u0915\u094B\u091F\u093F \u0938\u092E\u092A\u094D\u0930\u092D\n\u0928\u093F\u0930\u094D\u0935\u093F\u0918\u094D\u0928\u0902 \u0915\u0941\u0930\u0941 \u092E\u0947 \u0926\u0947\u0935\n\u0938\u0930\u094D\u0935\u0915\u093E\u0930\u094D\u092F\u0947\u0937\u0941 \u0938\u0930\u094D\u0935\u0926\u093E\n\nVakratunda mah\u0101k\u0101ya\ns\u016Bryako\u1E6Di samaprabha\nnirviighna\u1E43 kuru me deva\nsarvak\u0101rye\u1E63u sarvad\u0101\n\nO Lord with a curved trunk and massive body,\nwhose brilliance equals a billion suns,\nplease make all my endeavors free of obstacles, always.",
+source:"Traditional Hindu prayer",lang:"Sanskrit"},
+{id:"fatiha",title:"Al-Fatiha",tradition:"Islam",tag:"Opening",subtitle:"The opening chapter of the Quran",
+text:"\u0628\u0650\u0633\u0652\u0645\u0650 \u0671\u0644\u0644\u0651\u064E\u0647\u0650 \u0671\u0644\u0631\u0651\u064E\u062D\u0652\u0645\u064E\u0640\u0670\u0646\u0650 \u0671\u0644\u0631\u0651\u064E\u062D\u0650\u064A\u0645\u0650\n\u0671\u0644\u0652\u062D\u064E\u0645\u0652\u062F\u064F \u0644\u0650\u0644\u0651\u064E\u0647\u0650 \u0631\u064E\u0628\u0651\u0650 \u0671\u0644\u0652\u0639\u064E\u0640\u0670\u0644\u064E\u0645\u0650\u064A\u0646\u064E\n\u0671\u0644\u0631\u0651\u064E\u062D\u0652\u0645\u064E\u0640\u0670\u0646\u0650 \u0671\u0644\u0631\u0651\u064E\u062D\u0650\u064A\u0645\u0650\n\u0645\u064E\u0640\u0670\u0644\u0650\u0643\u0650 \u064A\u064E\u0648\u0652\u0645\u0650 \u0671\u0644\u062F\u0651\u0650\u064A\u0646\u0650\n\u0625\u0650\u064A\u0651\u064E\u0627\u0643\u064E \u0646\u064E\u0639\u0652\u0628\u064F\u062F\u064F \u0648\u064E\u0625\u0650\u064A\u0651\u064E\u0627\u0643\u064E \u0646\u064E\u0633\u0652\u062A\u064E\u0639\u0650\u064A\u0646\u064F\n\u0671\u0647\u0652\u062F\u0650\u0646\u064E\u0627 \u0671\u0644\u0635\u0651\u0650\u0631\u064E\u0627\u0637\u064E \u0671\u0644\u0652\u0645\u064F\u0633\u0652\u062A\u064E\u0642\u0650\u064A\u0645\u064E\n\nBismillahi r-rahmani r-rahim\nAl-hamdu lillahi rabbi l-alamin\nAr-rahmani r-rahim\nMaliki yawmi d-din\nIyyaka nabudu wa-iyyaka nastain\nIhdina s-sirata l-mustaqim\n\nIn the name of God, the Most Gracious, the Most Merciful.\nAll praise is due to God, Lord of all worlds.\nThe Most Gracious, the Most Merciful.\nMaster of the Day of Judgement.\nYou alone we worship, and You alone we ask for help.\nGuide us on the straight path.",
+source:"Quran, Surah 1 (Al-Fatiha)",lang:"Arabic"},
+{id:"refuge",title:"Three Refuges",tradition:"Buddhism",tag:"Devotion",subtitle:"Taking refuge in the Triple Gem",
+text:"Buddham saranam gacchami\nDhammam saranam gacchami\nSangham saranam gacchami\n\nI take refuge in the Buddha.\nI take refuge in the Dharma.\nI take refuge in the Sangha.\n\nDutiyampi Buddham saranam gacchami\nDutiyampi Dhammam saranam gacchami\nDutiyampi Sangham saranam gacchami\n\nFor a second time, I take refuge in the Buddha.\nFor a second time, I take refuge in the Dharma.\nFor a second time, I take refuge in the Sangha.",
+source:"Pali Canon, Khuddakapatha",lang:"Pali"},
+{id:"metta",title:"Metta Sutta",tradition:"Buddhism",tag:"Loving-kindness",subtitle:"The discourse on loving-kindness",
+text:"May all beings be happy and secure;\nmay all beings be happy at heart.\nWhatever living beings there may be \u2014\nfeeble or strong, tall, stout, or medium,\nshort, small, or large, seen or unseen,\nnear or far, born or to be born \u2014\nmay all beings be happy.\n\nLet none deceive another,\nnor despise anyone anywhere.\nNeither from anger nor ill will\nshould anyone wish harm to another.\n\nAs a mother would risk her own life\nto protect her only child,\neven so towards all living beings\none should cultivate a boundless heart.",
+source:"Sutta Nipata 1.8, Pali Canon",lang:"Pali"},
+{id:"shema",title:"Shema Yisrael",tradition:"Judaism",tag:"Unity",subtitle:"Hear, O Israel",
+text:"\u05E9\u05B0\u05C1\u05DE\u05B7\u05E2 \u05D9\u05B4\u05E9\u05B2\u05C2\u05E8\u05B8\u05D0\u05B5\u05DC \u05D9\u05B0\u05D4\u05D5\u05B8\u05D4 \u05D0\u05B1\u05DC\u05B9\u05D4\u05B5\u05D9\u05E0\u05D5\u05BC \u05D9\u05B0\u05D4\u05D5\u05B8\u05D4 \u05D0\u05B6\u05D7\u05B8\u05D3\n\nShema Yisrael Adonai Eloheinu Adonai Ehad\n\nHear, O Israel: the Lord is our God, the Lord is One.\n\n\u05D5\u05B0\u05D0\u05B8\u05D4\u05B7\u05D1\u05B0\u05EA\u05BC\u05B8 \u05D0\u05B5\u05EA \u05D9\u05B0\u05D4\u05D5\u05B8\u05D4 \u05D0\u05B1\u05DC\u05B9\u05D4\u05B6\u05D9\u05DA\u05B8\n\u05D1\u05BC\u05B0\u05DB\u05B8\u05DC \u05DC\u05B0\u05D1\u05B8\u05D1\u05B0\u05DA\u05B8 \u05D5\u05BC\u05D1\u05B0\u05DB\u05B8\u05DC \u05E0\u05B7\u05E4\u05B0\u05E9\u05B0\u05C1\u05DA\u05B8 \u05D5\u05BC\u05D1\u05B0\u05DB\u05B8\u05DC \u05DE\u05B0\u05D0\u05B9\u05D3\u05B6\u05DA\u05B8\n\nV'ahavta et Adonai Elohekha\nb'khol l'vav'kha uv'khol nafsh'kha uv'khol m'odekha\n\nYou shall love the Lord your God\nwith all your heart, with all your soul,\nand with all your might.",
+source:"Deuteronomy 6:4-5, Torah",lang:"Hebrew"},
+{id:"moolm",title:"Mool Mantar",tradition:"Sikhism",tag:"Foundation",subtitle:"The fundamental belief of Sikhism",
+text:"\u0A74 \u0A38\u0A24\u0A3F \u0A28\u0A3E\u0A2E\u0A41 \u0A15\u0A30\u0A24\u0A3E \u0A2A\u0A41\u0A30\u0A16\u0A41\n\u0A28\u0A3F\u0A30\u0A2D\u0A09 \u0A28\u0A3F\u0A30\u0A35\u0A48\u0A30\u0A41\n\u0A05\u0A15\u0A3E\u0A32 \u0A2E\u0A42\u0A30\u0A24\u0A3F \u0A05\u0A1C\u0A42\u0A28\u0A40 \u0A38\u0A48\u0A2D\u0A02\n\u0A17\u0A41\u0A30 \u0A2A\u0A4D\u0A30\u0A38\u0A3E\u0A26\u0A3F \u0A64\n\nIk Oankar Sat Nam Karta Purakhu\nNirbhau Nirvair\nAkal Murat Ajuni Saibhang\nGur Prasad\n\nThere is One God, Truth is His Name,\nHe is the Creator,\nWithout fear, without enmity,\nTimeless in form, beyond birth and death,\nSelf-illumined,\nRealized by the Guru's grace.",
+source:"Guru Granth Sahib, Opening verse",lang:"Gurmukhi"}
+];
+
+const TRADITIONS=["All","Christianity","Hinduism","Islam","Buddhism","Judaism","Sikhism"];
+const TC={
+  Christianity:{bg:"#1a1520",accent:"#C4956A"},
+  Hinduism:{bg:"#1a1318",accent:"#D4734E"},
+  Islam:{bg:"#131820",accent:"#5A9E8F"},
+  Buddhism:{bg:"#18161a",accent:"#B8954A"},
+  Judaism:{bg:"#151820",accent:"#7088B8"},
+  Sikhism:{bg:"#181815",accent:"#C89040"}
+};
+
+// Language hints for TTS
+const LANG_MAP={
+  English:"en-US",Sanskrit:"hi-IN",Arabic:"ar-SA",Pali:"en-US",Hebrew:"he-IL",Gurmukhi:"pa-IN"
+};
+
+// ═══ STATE ═══
+let filter="All",favorites=JSON.parse(localStorage.getItem('praier_favs')||'[]'),showFavs=false;
+let currentPrayer=null,speaking=false,japaCount=0,japaTarget=108,japaVoiceAuto=false;
+
+// ═══ SCREENS ═══
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='home')buildHome();
+}
+
+// ═══ SPLASH ═══
+document.getElementById('splash').addEventListener('click',()=>showScreen('home'));
+
+// ═══ HOME ═══
+function buildHome(){
+  // Filters
+  const fb=document.getElementById('filterBar');
+  if(!fb.children.length){
+    TRADITIONS.forEach(t=>{
+      const b=document.createElement('button');b.className='pill'+(filter===t?' sel':'');
+      b.textContent=t;b.onclick=()=>{filter=t;showFavs=false;buildHome()};
+      fb.appendChild(b);
+    });
+  } else {
+    fb.querySelectorAll('.pill').forEach((b,i)=>b.className='pill'+(TRADITIONS[i]===filter?' sel':''));
+  }
+
+  // Fav button
+  document.getElementById('favBtn').style.background=showFavs?'rgba(196,149,106,.15)':'rgba(255,255,255,.04)';
+  document.getElementById('favBtn').style.borderColor=showFavs?'rgba(196,149,106,.3)':'rgba(255,255,255,.06)';
+  document.getElementById('favBtn').style.color=showFavs?'#C4956A':'rgba(245,240,235,.35)';
+  document.getElementById('favCount').textContent=favorites.length;
+
+  // Filter prayers
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  let list=showFavs?PRAYERS.filter(p=>favorites.includes(p.id)):PRAYERS.filter(p=>{
+    const mf=filter==='All'||p.tradition===filter;
+    const mq=!q||p.title.toLowerCase().includes(q)||p.subtitle.toLowerCase().includes(q)||p.tag.toLowerCase().includes(q)||p.tradition.toLowerCase().includes(q);
+    return mf&&mq;
+  });
+
+  // Section label
+  const sl=document.getElementById('sectionLabel');
+  sl.textContent=showFavs?`saved prayers (${list.length})`:filter==='All'?`all prayers (${list.length})`:`${filter} (${list.length})`;
+  document.getElementById('filterBar').style.display=showFavs?'none':'flex';
+
+  // Render cards
+  const pl=document.getElementById('prayerList');pl.innerHTML='';
+  list.forEach((p,i)=>{
+    const ac=(TC[p.tradition]||{accent:'#C4956A'}).accent;
+    const d=document.createElement('div');d.className='prayer-card';
+    d.style.animation=`fU .4s ease-out ${.05+i*.03}s both`;
+    d.innerHTML=`<div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${ac};border-radius:3px 0 0 3px;opacity:.5"></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+            <span style="font-size:14px;font-weight:400;color:${ac}">${p.title}</span>
+            <span class="tag" style="background:${ac}12;color:${ac}">${p.tag}</span>
+          </div>
+          <div style="font-size:11px;color:rgba(245,240,235,.3);font-style:italic">${p.subtitle}</div>
+          <div style="font-size:9px;color:rgba(245,240,235,.15);margin-top:4px;font-family:system-ui,sans-serif">${p.tradition} \u00B7 ${p.lang}</div>
+        </div>
+        <div style="font-size:16px;color:rgba(245,240,235,.12);margin-left:8px">\u2192</div>
+      </div>`;
+    d.onclick=()=>openPrayer(p);
+    pl.appendChild(d);
+  });
+
+  // Empty state
+  const es=document.getElementById('emptyState');
+  es.style.display=list.length?'none':'block';
+  document.getElementById('emptyText').textContent=showFavs?'No saved prayers yet. Tap \u2665 on any prayer to save it.':'No prayers found. Try the AI search (\u2726) to find any prayer in any language.';
+}
+
+function onSearch(){showFavs=false;buildHome()}
+function toggleFavView(){showFavs=!showFavs;buildHome()}
+
+// ═══ PRAYER DETAIL ═══
+function openPrayer(p){
+  currentPrayer=p;
+  const ac=(TC[p.tradition]||{accent:'#C4956A'}).accent;
+  const bg=(TC[p.tradition]||{bg:'#1a1520'}).bg;
+
+  document.getElementById('detailBg').style.background=ac;
+  document.getElementById('detailHeader').innerHTML=`
+    <div style="font-size:10px;letter-spacing:3px;color:${ac};text-transform:uppercase;margin-bottom:6px;font-family:system-ui,sans-serif;font-weight:500">${p.tradition} \u00B7 ${p.tag}</div>
+    <h1 style="font-size:28px;font-weight:300;color:${ac};margin-bottom:4px">${p.title}</h1>
+    <p style="font-size:12px;color:rgba(245,240,235,.3);font-style:italic">${p.subtitle}</p>`;
+
+  document.getElementById('detailText').style.borderColor=ac+'15';
+  document.getElementById('detailText').innerHTML=`<div style="font-size:15px;line-height:2;color:rgba(245,240,235,.85);white-space:pre-line;text-align:center">${p.text}</div>`;
+
+  document.getElementById('detailSource').innerHTML=`
+    <div style="font-size:10px;color:rgba(245,240,235,.25);letter-spacing:2px;font-family:system-ui,sans-serif">${p.source}</div>
+    <div style="font-size:10px;color:rgba(245,240,235,.15);margin-top:4px;font-family:system-ui,sans-serif">Original language: ${p.lang}</div>`;
+
+  // Fav state
+  updateFavBtn();
+  // Reset japa
+  japaCount=0;updateJapa();
+  // Reset voice
+  stopVoice();
+
+  // Style japa button
+  document.getElementById('japaBtn').style.borderColor=ac+'50';
+  document.getElementById('japaBtn').style.background=ac+'15';
+  document.getElementById('japaBtn').style.color=ac;
+  document.getElementById('japaProgress').style.background=ac;
+
+  showScreen('detail');
+}
+
+function updateFavBtn(){
+  const isFav=currentPrayer&&favorites.includes(currentPrayer.id);
+  const btn=document.getElementById('favToggle');
+  btn.innerHTML=isFav?'\u2665':'\u2661';
+  btn.style.filter=isFav?'none':'grayscale(1) opacity(.3)';
+  btn.style.color=isFav?(TC[currentPrayer.tradition]||{accent:'#C4956A'}).accent:'';
+}
+
+function toggleFav(){
+  if(!currentPrayer)return;
+  const id=currentPrayer.id;
+  if(favorites.includes(id))favorites=favorites.filter(x=>x!==id);
+  else favorites.push(id);
+  localStorage.setItem('praier_favs',JSON.stringify(favorites));
+  updateFavBtn();
+}
+
+// ═══ VOICE (TTS) ═══
+function getVoiceText(p){
+  // Extract just the transliteration + translation (skip original script for TTS)
+  const lines=p.text.split('\n').filter(l=>l.trim());
+  // For English prayers, use full text. For others, use transliteration lines
+  if(p.lang==='English')return p.text;
+  return lines.filter(l=>!/[\u0900-\u097F\u0600-\u06FF\u0590-\u05FF\u0A00-\u0A7F]/.test(l)).join('\n');
+}
+
+function toggleVoice(){
+  if(speaking){stopVoice();return}
+  if(!currentPrayer)return;
+  const text=getVoiceText(currentPrayer);
+  const lang=LANG_MAP[currentPrayer.lang]||'en-US';
+  const utt=new SpeechSynthesisUtterance(text);
+  utt.lang=lang;utt.rate=.85;utt.pitch=.95;
+  utt.onend=()=>{speaking=false;updateVoiceBtn()};
+  utt.onerror=()=>{speaking=false;updateVoiceBtn()};
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utt);
+  speaking=true;updateVoiceBtn();
+}
+
+function stopVoice(){speechSynthesis.cancel();speaking=false;updateVoiceBtn()}
+
+function updateVoiceBtn(){
+  const btn=document.getElementById('voiceBtn');
+  const ac=currentPrayer?(TC[currentPrayer.tradition]||{accent:'#C4956A'}).accent:'#C4956A';
+  btn.style.background=speaking?ac+'20':'rgba(255,255,255,.05)';
+  btn.style.borderColor=speaking?ac+'40':'rgba(255,255,255,.08)';
+  btn.style.color=speaking?ac:'rgba(245,240,235,.5)';
+  btn.innerHTML=speaking?'\u25A0':'\u266B';
+}
+
+// ═══ JAPA COUNTER ═══
+function setJapaTarget(n){
+  japaTarget=n;japaCount=0;
+  document.getElementById('japaTarget').textContent=n;
+  document.querySelectorAll('.japa-preset').forEach(b=>b.className='japa-preset pill'+(parseInt(b.textContent)===n?' sel':''));
+  updateJapa();
+}
+
+function tapJapa(){
+  if(japaCount>=japaTarget)return;
+  japaCount++;
+  // Haptic
+  if(navigator.vibrate)navigator.vibrate(15);
+  // Animate
+  const el=document.getElementById('japaCount');
+  el.style.transform='scale(1.15)';setTimeout(()=>el.style.transform='scale(1)',120);
+  updateJapa();
+  // Auto-voice on each count
+  if(japaVoiceAuto&&currentPrayer){
+    const text=getVoiceText(currentPrayer);
+    const lang=LANG_MAP[currentPrayer.lang]||'en-US';
+    const utt=new SpeechSynthesisUtterance(text);
+    utt.lang=lang;utt.rate=.9;utt.pitch=.95;
+    speechSynthesis.cancel();speechSynthesis.speak(utt);
+  }
+  // Complete
+  if(japaCount>=japaTarget){
+    if(navigator.vibrate)navigator.vibrate([100,50,100,50,100]);
+    document.getElementById('japaBtn').innerHTML='\u2713';
+  }
+}
+
+function resetJapa(){
+  japaCount=0;
+  document.getElementById('japaBtn').innerHTML='+';
+  updateJapa();
+}
+
+function updateJapa(){
+  document.getElementById('japaCount').textContent=japaCount;
+  const pct=japaTarget>0?Math.min(100,(japaCount/japaTarget)*100):0;
+  document.getElementById('japaProgress').style.width=pct+'%';
+}
+
+function toggleJapaVoice(){
+  japaVoiceAuto=!japaVoiceAuto;
+  const btn=document.getElementById('japaVoiceBtn');
+  const ac=currentPrayer?(TC[currentPrayer.tradition]||{accent:'#C4956A'}).accent:'#C4956A';
+  btn.style.background=japaVoiceAuto?ac+'15':'rgba(255,255,255,.04)';
+  btn.style.borderColor=japaVoiceAuto?ac+'30':'rgba(255,255,255,.06)';
+  btn.style.color=japaVoiceAuto?ac:'rgba(245,240,235,.3)';
+}
+
+// ═══ AI SEARCH ═══
+async function aiSearch(){
+  const q=document.getElementById('searchInput').value.trim();
+  if(!q)return;
+  const rd=document.getElementById('aiResult');
+  rd.style.display='block';
+  rd.innerHTML=`<div style="text-align:center;padding:24px;color:rgba(196,149,106,.5);font-size:13px;font-style:italic">
+    <div style="display:inline-block;width:20px;height:20px;border:2px solid rgba(196,149,106,.15);border-top:2px solid #C4956A;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px"></div>
+    <div>searching sacred texts...</div></div>`;
+
+  try{
+    // Check for API key in localStorage
+    let apiKey=localStorage.getItem('praier_api_key');
+    if(!apiKey){
+      rd.innerHTML=`<div style="background:rgba(196,149,106,.06);border:1px solid rgba(196,149,106,.15);border-radius:16px;padding:18px 16px">
+        <div style="font-size:11px;color:#C4956A;margin-bottom:8px;font-family:system-ui,sans-serif;font-weight:500">\u2726 AI Search Setup</div>
+        <p style="font-size:12px;color:rgba(245,240,235,.5);margin-bottom:10px">To enable AI-powered prayer search, enter your Anthropic API key. It's stored locally on your device only.</p>
+        <input id="apiKeyInput" type="password" placeholder="sk-ant-..." style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(196,149,106,.2);background:rgba(255,255,255,.03);color:#F5F0EB;font-size:12px;font-family:system-ui,sans-serif;outline:none;box-sizing:border-box;margin-bottom:8px">
+        <button onclick="saveApiKey()" style="width:100%;padding:10px;border-radius:10px;border:none;background:#C4956A;color:#fff;font-size:12px;font-family:system-ui,sans-serif;font-weight:500;cursor:pointer">save & search</button>
+        <button onclick="document.getElementById('aiResult').style.display='none'" style="width:100%;padding:8px;border:none;background:transparent;color:rgba(245,240,235,.25);font-size:11px;cursor:pointer;font-family:system-ui,sans-serif;margin-top:4px">cancel</button>
+      </div>`;
+      return;
+    }
+
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:1000,
+        messages:[{role:'user',content:`You are prAIer, a multi-faith prayer assistant. The user is searching for: "${q}"
+
+Find and present the most relevant prayer, verse, mantra, or sacred text. Respond in this exact JSON format only, no markdown, no backticks:
+{"title":"Prayer name","tradition":"Religion/tradition","tag":"Category","text":"Full prayer text with original language if applicable, transliteration, and English translation separated by newlines","source":"Scriptural source and date","lang":"Original language"}
+
+If the request is in a specific language, provide the prayer in that language. Be authentic and reverent. Use canonical, established texts only.`}]
+      })
+    });
+    const data=await res.json();
+    const txt=data.content?.map(c=>c.text||'').join('')||'';
+    const clean=txt.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    const ac=(TC[parsed.tradition]||{accent:'#C4956A'}).accent;
+    rd.innerHTML=`<div style="background:linear-gradient(135deg,${ac}08,${ac}03);border:1px solid ${ac}20;border-radius:16px;padding:18px 16px;animation:fU .4s ease-out">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:${ac};text-transform:uppercase;font-family:system-ui,sans-serif;font-weight:600;margin-bottom:3px">\u2726 AI result \u00B7 ${parsed.tradition}</div>
+          <div style="font-size:17px;font-weight:400;color:${ac}">${parsed.title}</div>
+        </div>
+        <button onclick="document.getElementById('aiResult').style.display='none'" style="background:none;border:none;color:rgba(245,240,235,.2);font-size:16px;cursor:pointer;padding:4px">\u00D7</button>
+      </div>
+      <div style="font-size:14px;line-height:1.9;color:rgba(245,240,235,.75);white-space:pre-line;margin-top:8px">${parsed.text}</div>
+      <div style="font-size:10px;color:rgba(245,240,235,.2);margin-top:10px;font-family:system-ui,sans-serif">${parsed.source} \u00B7 ${parsed.lang}</div>
+    </div>`;
+  }catch(e){
+    rd.innerHTML=`<div style="background:rgba(196,149,106,.06);border:1px solid rgba(196,149,106,.15);border-radius:16px;padding:18px 16px">
+      <div style="font-size:13px;color:rgba(245,240,235,.5);font-style:italic">Could not search. Try browsing the prayers below, or check your API key.</div>
+      <button onclick="localStorage.removeItem('praier_api_key');aiSearch()" style="background:none;border:none;color:#C4956A;font-size:11px;cursor:pointer;font-family:system-ui,sans-serif;margin-top:6px;padding:0">reset API key</button>
+    </div>`;
+  }
+}
+
+function saveApiKey(){
+  const k=document.getElementById('apiKeyInput').value.trim();
+  if(k){localStorage.setItem('praier_api_key',k);aiSearch()}
+}
+
+// ═══ INIT ═══
+buildHome();
+</script>
+</body>
+</html>
